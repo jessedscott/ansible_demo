@@ -1,0 +1,38 @@
+---
+- name: Install and start the Apache service
+  hosts: serverc.lab.example.com
+  become: true
+  tasks:
+    - name: Install the Apache service
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+
+    - name: Place index.html content on web servers 
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+
+    - name: Start and enable the Apache service
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Open http port in firewall
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+- name: Test connection to web server
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Connect to web server
+      ansible.builtin.uri:
+        url: http://serverc.lab.example.com
+        return_content: yes
+        status_code: 200
+

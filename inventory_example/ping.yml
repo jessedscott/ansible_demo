@@ -1,0 +1,6 @@
+---
+- name: Ping servers to test the inventory
+  hosts: all
+  tasks:
+    - name: Ping the servers
+      ansible.builtin.ping:

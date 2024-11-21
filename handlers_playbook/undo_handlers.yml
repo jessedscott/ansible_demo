@@ -1,0 +1,47 @@
+---
+- name: Deploy the web application server
+  hosts: web
+  become: true
+  vars:
+    packages:
+      - nginx
+      - php-fpm
+    web_service: nginx
+    app_service: php-fpm
+    web_config_dst: /etc/nginx/nginx.conf
+    app_config_dst: /etc/php-fpm.conf
+
+  tasks:
+    - name: Stop and disable the web service
+      ansible.builtin.service:
+        name: "{{ web_service }}"
+        state: stopped
+        enabled: false
+
+    - name: Stop and disable the application service
+      ansible.builtin.service:
+        name: "{{ app_service }}"
+        state: stopped
+        enabled: false
+
+    - name: Remove the web config file
+      ansible.builtin.file:
+        path: "{{ web_config_dst }}"
+        state: absent
+
+    - name: Remove the app config file
+      ansible.builtin.file:
+        path: "{{ app_config_dst }}"
+        state: absent
+
+    - name: Remove the packages
+      ansible.builtin.dnf:
+        name: "{{ packages }}"
+        state: absent
+
+    - name: Close http port in firewall
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: disabled
+        immediate: true

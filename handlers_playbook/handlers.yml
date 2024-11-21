@@ -1,0 +1,66 @@
+---
+- name: Deploy the web application server
+  hosts: web
+  become: true
+  vars:
+    packages:
+      - nginx
+      - php-fpm
+    web_service: nginx
+    app_service: php-fpm
+    web_config_src: files/nginx.conf.standard
+    web_config_dst: /etc/nginx/nginx.conf
+    app_config_src: files/php-fpm.conf.standard
+    app_config_dst: /etc/php-fpm.conf
+
+  tasks:
+    - name: Install the packages
+      ansible.builtin.dnf:
+        name: "{{ packages }}"
+        state: present
+
+    - name: Start and enable the web service
+      ansible.builtin.service:
+        name: "{{ web_service }}"
+        state: started
+        enabled: true
+
+    - name: Start and enable the application service
+      ansible.builtin.service:
+        name: "{{ app_service }}"
+        state: started
+        enabled: true
+
+    - name: Deploy the web config file
+      ansible.builtin.copy:
+        src: "{{ web_config_src }}"
+        dest: "{{ web_config_dst }}"
+        force: true
+      notify:
+        - restart web service
+
+    - name: Deploy the app config file
+      ansible.builtin.copy:
+        src: "{{ app_config_src }}"
+        dest: "{{ app_config_dst }}"
+        force: true
+      notify:
+        - restart app service
+
+    - name: Open http port in firewall
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+  handlers:
+    - name: restart web service
+      ansible.builtin.service:
+        name: "{{ web_service }}"
+        state: restarted
+
+    - name: restart app service
+      ansible.builtin.service:
+        name: "{{ app_service }}"
+        state: restarted

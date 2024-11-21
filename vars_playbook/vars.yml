@@ -1,0 +1,33 @@
+---
+- name: Install and start the Apache service
+  hosts: web
+  become: true
+  vars:
+    apache_package: httpd
+    apache_service: http
+    apache_content: index.html
+    apache_state: started
+
+  tasks:
+    - name: Install the Apache service
+      ansible.builtin.dnf:
+        name: "{{ apache_package }}"
+        state: present
+
+    - name: Place {{ apache_content }} content on web servers 
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/{{ apache_content }}
+
+    - name: Start and enable the Apache service
+      ansible.builtin.service:
+        name: httpd
+        state: "{{ apache_state }}"
+        enabled: true
+
+    - name: Open http port in firewall
+      ansible.posix.firewalld:
+        service: "{{ apache_service }}"
+        permanent: true
+        state: enabled
+        immediate: true

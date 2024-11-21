@@ -1,0 +1,16 @@
+---
+- name: Remove the users from the server 
+  hosts: serverc.lab.example.com 
+  become: true
+  tasks:
+    - name: Remove the users from the server
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - example_user1
+        - example_user2
+        - example_user3
+        - example_user4
+        - example_user5
+        - example_user6

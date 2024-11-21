@@ -1,0 +1,26 @@
+---
+- name: Create users on the server
+  hosts: serverc.lab.example.com 
+  become: true
+  vars:
+    users:
+      - example_user4
+      - example_user5
+      - example_user6 
+  tasks:
+    - name: Create users with loop
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password: "{{ 'redhat' | password_hash('sha512','mysalt') }}"
+        state: present
+      loop:
+        - example_user1
+        - example_user2
+        - example_user3
+
+    - name: Create users with looped variable
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password: "{{ 'redhat' | password_hash('sha512','mysalt') }}"
+        state: present
+      loop: "{{ users }}"

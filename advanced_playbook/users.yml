@@ -1,0 +1,17 @@
+---
+- users:
+  - name: user1
+    firstname: john
+    middlename: andrew
+    lastname: doe
+    uid: 1020
+  - name: user2
+    firstname: karen
+    middlename: betty
+    lastname: engels
+    uid: 1021
+  - name: user3
+    firstname: lauren
+    middlename: christian
+    lastname: roberts
+    uid: 1022

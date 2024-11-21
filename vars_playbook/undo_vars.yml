@@ -1,0 +1,27 @@
+---
+- name: Remove Apache service and web content
+  hosts: web
+  become: true
+  tasks:
+    - name: Stop and disable Apache service
+      ansible.builtin.service:
+        name: httpd
+        state: stopped
+        enabled: false
+
+    - name: Remove Apache web content
+      ansible.builtin.file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Uninstall Apache service
+      ansible.builtin.dnf:
+        name: httpd
+        state: absent
+
+    - name: Close http port in firewall
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: disabled 
+        immediate: true

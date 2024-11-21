@@ -1,0 +1,24 @@
+---
+- name: Advanced playbook
+  hosts: serverc.lab.example.com
+  vars_files: users.yml
+  vars:
+    genpass: "{{ lookup('password', 'credentials/' + item.name + '_password length=5 chars=digits') }}"
+    firstname: "{{ item.firstname | capitalize }}"
+    middlename: "{{ item.middlename | capitalize }}"
+    lastname: "{{ item.lastname | capitalize }}"
+
+  roles:
+    - name: mymotd
+      become: true
+
+  tasks:
+    - name: create users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        comment: "{{ firstname }} {{ middlename }} {{ lastname }}"
+        uid: "{{ item.uid }}"
+        password: "{{ genpass | password_hash('sha512', 'mysalt') }}"
+        state: present
+      loop: "{{ users }}"
+      become: true

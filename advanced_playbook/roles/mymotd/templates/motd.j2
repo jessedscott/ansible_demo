@@ -1,0 +1,3 @@
+{% set the_date = '%d-%b-%Y' | strftime(ansible_facts['date_time']['epoch']) %}
+Connected to: {{ ansible_facts['fqdn'] }}
+Ansible last updated the /etc/motd file on {{ the_date }}.
