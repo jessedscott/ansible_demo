@@ -2,6 +2,7 @@
 - name: Install and start the Apache service
   hosts: web
   become: true
+  # Adding a comment
   tasks:
     - name: Install the Apache service
       ansible.builtin.dnf:
